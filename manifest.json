@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Yellow Button Auto Clicker",
+  "version": "1.0",
+  "description": "Automatically scrolls to and clicks the first yellow button in the data table",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Yellow Button Auto Clicker"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' http://localhost:* http://127.0.0.1:*; object-src 'self'"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
