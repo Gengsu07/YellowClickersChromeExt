@@ -3,33 +3,47 @@
 
 // Auto-run functionality when page loads
 window.addEventListener("load", async function () {
-  // Wait for page to fully load
-  setTimeout(async () => {
-    try {
-      const result = await chrome.storage.local.get([
-        "autoRunEnabled",
-        "continueAfterReload",
-      ]);
+  // Check for processing element before proceeding
+  const processingCheckInterval = setInterval(async () => {
+    const processingElement = document.getElementById(
+      "dsp4list-grid_processing"
+    );
 
-      if (result.autoRunEnabled) {
-        const tableWrapper = document.getElementById("dsp4list-grid_wrapper");
-        if (tableWrapper) {
-          console.log("Auto-run enabled: Starting yellow button click...");
-          showAutoStartIndicator();
+    // If processing is complete (element not visible)
+    if (!processingElement || processingElement.style.display === "none") {
+      clearInterval(processingCheckInterval);
 
-          // Clear reload flag if set
-          if (result.continueAfterReload) {
-            await chrome.storage.local.set({ continueAfterReload: false });
+      // Wait additional 3 seconds after processing completes
+      setTimeout(async () => {
+        try {
+          const result = await chrome.storage.local.get([
+            "autoRunEnabled",
+            "continueAfterReload",
+          ]);
+
+          if (result.autoRunEnabled) {
+            const tableWrapper = document.getElementById(
+              "dsp4list-grid_wrapper"
+            );
+            if (tableWrapper) {
+              console.log("Auto-run enabled: Starting yellow button click...");
+              showAutoStartIndicator();
+
+              // Clear reload flag if set
+              if (result.continueAfterReload) {
+                await chrome.storage.local.set({ continueAfterReload: false });
+              }
+
+              // Start the process
+              findAndClickYellowButton();
+            }
           }
-
-          // Start the process
-          findAndClickYellowButton();
+        } catch (error) {
+          console.error("Error checking auto-run setting:", error);
         }
-      }
-    } catch (error) {
-      console.error("Error checking auto-run setting:", error);
+      }, 3000);
     }
-  }, 2000);
+  }, 500); // Check every 500ms
 });
 
 // Auto mode function that runs continuously
